@@ -611,6 +611,13 @@ async def on_end_call(
         ),
     )
 
+    # Store full conversation transcript
+    async with _db.call_transac(
+        call=call,
+        scheduler=scheduler,
+    ):
+        call.transcript = call.generate_transcript()
+
 
 async def _intelligence_sms(
     call: CallStateModel,

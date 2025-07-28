@@ -43,6 +43,7 @@ class CallGetModel(BaseModel):
     next: NextModel | None = None
     reminders: list[ReminderModel] = []
     synthesis: SynthesisModel | None = None
+    transcript: list[dict[str, str]] = Field(default_factory=list)
 
     @field_validator("claim")
     @classmethod
@@ -183,3 +184,13 @@ class CallStateModel(CallGetModel, extra="ignore"):
             and self.messages[-2].persona == MessagePersonaEnum.ASSISTANT
             and self.messages[-1].action == MessageActionEnum.HANGUP
         )
+
+    def generate_transcript(self) -> list[dict[str, str]]:
+        """Return the conversation transcript as a JSON serializable object."""
+        return [
+            {
+                "persona": message.persona.value,
+                "content": message.content,
+            }
+            for message in self.messages
+        ]
